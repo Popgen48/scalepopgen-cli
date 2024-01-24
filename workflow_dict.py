@@ -1,7 +1,7 @@
 class worfklow_dict:
     def __init__(self):
         self.help_general = {
-            "input": "In case of vcf, the input file must end with .csv and in case of plink, it must end with .p.csv",
+            "input": "In case of vcf, the input file must end with .csv and in case of plink, it must end with .p.csv.(see ./example_files/example_vcf_input.csv)",
             "outDir ": "Path to the directory, where all the outputs will be stored. If the directory is not present, it will be created.",
             "sample_map": "Path to the sample map file(must end with .map).Format:first column as sample id and second column as population id.Required only if the input is vcf.",
             "color_map": "Path to the file containing population name as first column and color in hex codes as second column.Must end with .map",
@@ -26,11 +26,21 @@ class worfklow_dict:
             "outgroup": "null",
         }
 
-        self.help_filtering = {
+        self.help_indi_filtering = {
             "apply_indi_filters": "Perform sample filtering?",
             "king_cutoff": "Threshold of relatedness to remove samples",
             "mind": "Threshold of missing genotypes to remove samples",
             "rem_indi": "Remove custom samples",
+        }
+
+        self.param_indi_filtering = {
+            "apply_indi_filters": False,
+            "king_cutoff": 0.0884,
+            "mind": 0.05,
+            "rem_indi": "null",
+        }
+
+        self.help_snp_filtering = {
             "apply_snp_filters": "Perform site filtering?",
             "rem_snps": "Remove custom sites",
             "maf": "Threshold of minor allele frequency to remove sites",
@@ -42,11 +52,7 @@ class worfklow_dict:
             "indiv_summary": "Calculate sample-based summary statistics?",
         }
 
-        self.param_filtering = {
-            "apply_indi_filters": False,
-            "king_cutoff": 0.0884,
-            "mind": 0.05,
-            "rem_indi": "null",
+        self.param_snp_filtering = {
             "apply_snp_filters": False,
             "rem_snps": "null",
             "maf": 0.05,
@@ -55,31 +61,55 @@ class worfklow_dict:
             "hwe": "null",
             "max_missing": 0.05,
             "minQ": "null",
-            "indiv_summary": False,
         }
 
-        self.genetic_structure = {
-            "genetic_structure": "false",
+        self.help_genetic_structure = {
+            "genetic_structure": "Perform analyses of genetic structure? Setting this to false, will skip all the analyses mentioned below",
+            "rem_indi_structure": "Remove custom samples",
+            "ld_filt": "Filter sites based on linkage disequilibrium using plink2? Setting this to False, will skip the step of LD filtering",
+            "ld_window_size": "Window size for LD filtering",
+            "ld_step_size": "Step size for LD filtering",
+            "r2_threshold": "Threshold of r2 for LD filtering",
+            "smartpca": "Perform principal component analysis?",
+            "smartpca_param": "Additional parameters for PCA",
+            "pca_plot_yml": "The yml file to plot interactive PCA results",
+            "marker_map": "Marker shapes for PCA plot",
+            "chrom_map": "Map file to replace chromosome ids (see ./example_files/oldchrom_newchrom.map",
+            "admixture": "Perform analysis with Admixture?",
+            "start_k": "Starting K-value for Admixture",
+            "end_k": "Ending K-value for Admixture",
+            "admixture_args": "Set additional parameters of ADMIXTURE tools",
+            "admixture_colors": "Custom colors for Admixture plot",
+            "admixture_plot_pop_order": "Order of populations for Admixture plot",
+            "admixture_plot_yml": "The yml file to plot interactive Admixture results",
+            "pairwise_global_fst": "Calculate pairwise Fst distances?",
+            "fst_plot_yml": "The yml file to plot interactive Fst-based NJ tree",
+            "ibs_dist": "Calculate 1-ibs distances?",
+            "ibs_plot_yml": "The yml file to plot interactive IBS-based NJ tree",
+        }
+
+        self.param_genetic_structure = {
+            "genetic_structure": False,
             "rem_indi_structure": "null",
-            "ld_filt": "false",
+            "ld_filt": False,
             "ld_window_size": 50,
             "ld_step_size": 10,
             "r2_threshold": 0.1,
-            "smartpca": "false",
+            "smartpca": False,
             "smartpca_param": "null",
             "pca_plot_yml": "popgen48-scalepopgen/extra/plots/pca.yml",
             "marker_map": "null",
             "chrom_map": "null",
-            "admixture": "false",
+            "admixture": False,
             "start_k": 2,
             "end_k": 21,
             "admixture_args": "--cv=5",
             "admixture_colors": "popgen48-scalepopgen/extra/hexcolorcodes.txt",
             "admixture_plot_pop_order": "null",
             "admixture_plot_yml": "popgen48-scalepopgen/extra/plots/admixture.yml",
-            "pairwise_global_fst": "false",
+            "pairwise_global_fst": False,
             "fst_plot_yml": "popgen48-scalepopgen/extra/plots/fst_nj.yml",
-            "ibs_dist": "false",
+            "ibs_dist": False,
             "ibs_plot_yml": "popgen48-scalepopgen/extra/plots/ibs_nj.yml",
         }
 
@@ -107,4 +137,17 @@ class worfklow_dict:
             "window_size": 50000,
             "step_size": 50000,
             "perc_threshold": 0.01,
+        }
+        self.tool_args = {
+            "admixture_args": [
+                "--seed",
+                "-m",
+                "--method",
+                "-a",
+                "--acceleration",
+                "-C",
+                "-c",
+                "-B",
+                "--cv",
+            ]
         }

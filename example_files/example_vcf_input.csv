@@ -1,0 +1,3 @@
+id,vcf,vcf_idx
+1,/data/vcf/chrom1.vcf.gz,/data/vcf/chrom1.vcf.gz.tbi
+2,/data/vcf/chrom1.vcf.gz,/data/vcf/chrom2.vcf.gz.tbi
