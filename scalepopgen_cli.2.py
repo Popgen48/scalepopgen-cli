@@ -16,20 +16,29 @@ console = Console()
 
 
 class util:
-    def print_header(self):
+    def print_global_header(self):
         f = pyfiglet.figlet_format("scale popgen", font="starwars")
         print(f)
+
+    def print_local_header(self, name):
+        console.print(f"[yellow]{name}[/yellow]")
+        console.print(f"type n to skip entering any parameter")
 
     def clear_screen(self):
         os.system("clear")
 
+    def regex_pattern(self, name):
+        pattern = "(\[.+?\])(.*)(\[.+?\])(:)(.*)"
+        match = re.findall(pattern, name)
+        return match[0][1]
+
     def read_options(self, dict):
         gpl = []
         for key in dict:
-            gpl.append(f"{key}: {dict[key]}")
+            gpl.append(f"[yellow]{key}[/yellow]: [green]{dict[key]}[/green]")
         gpl.append("back")
         name = select(gpl, cursor="🢧", cursor_style="cyan")
-        name = str(name).split(":")[0]
+        name = name if name == "back" else self.regex_pattern(str(name))
         return name
 
     def is_file_exit(self, file, default_param):
@@ -81,7 +90,9 @@ class util:
         self, param, help_message, default_param, exp_args_list
     ):
         string_o = default_param
-        console.print(help_message)
+        console.print(
+            help_message + ", valid arguments are: " + " ".join(exp_args_list)
+        )
         param_var = param + ":"
         is_broken = False
         string_o = prompt(param_var, target_type=str)
@@ -152,13 +163,9 @@ class SetGeneralParameters:
         self.help_general = self.d.help_general
         self.param_general = param_general
 
-    def print_header(self):
-        console.print(f"[yellow]setting the general parameters[/yellow]")
-        console.print(f"[green]type n to skip entering any parameter[/green]")
-
     def main_function(self):
-        self.u.print_header()
-        self.print_header()
+        self.u.print_global_header()
+        self.u.print_local_header("setting the general parameters")
         name = self.u.read_options(self.param_general)
         map_ext_dict = {
             "sample_map": ".map",
@@ -188,11 +195,94 @@ class SetGeneralParameters:
                 update_param = self.u.read_bool_confirm(name, self.help_general[name])
             self.param_general[name] = update_param
             self.u.clear_screen()
-            self.u.print_header()
-            self.print_header()
+            self.u.print_global_header()
+            self.u.print_local_header("setting the general parameters")
             name = self.u.read_options(self.param_general)
         self.u.clear_screen()
         return self.param_general
+
+
+class SetSigSelParam:
+    def __init__(self, param_sig_sel):
+        self.d = dictionary()
+        self.u = util()
+        self.tool_args = self.d.tool_args
+        self.param_sig_sel = param_sig_sel
+
+    def main_function(self):
+        self.u.print_global_header()
+        self.u.print_local_header(
+            "setting the parameters for running the workflows to identify the signatures of selection"
+        )
+        analyses = [
+            "set the general parameters which are appplicable for all the analyses implemented in this section",
+            "set the parameters of the workflows for vcftools-based analyses (fst, Tajimas'D and pi-values)",
+            "set the parameters of the workflow of sweepfinder2",
+            "set the parameters of the workflow to phased the data",
+            "set the parameters of the workflows for selscan-based analyses (iHS, XP-EHH)",
+            "back",
+        ]
+        analysis = select(analyses, cursor="🢧", cursor_style="cyan")
+        while str(analysis) != "back":
+            print(analysis)
+            self.u.clear_screen()
+            self.u.print_global_header()
+            self.u.print_local_header(
+                "setting the parameters for running the workflows to identify the signatures of selection"
+            )
+            analysis = select(analyses, cursor="🢧", cursor_style="cyan")
+        self.u.clear_screen()
+
+
+class SetTreemixParam:
+    def __init__(self, param_treemix):
+        self.d = dictionary()
+        self.u = util()
+        self.tool_args = self.d.tool_args
+        self.help_treemix = self.d.help_treemix
+        self.param_treemix = param_treemix
+
+    def main_function(self):
+        self.u.print_global_header()
+        self.u.print_local_header(
+            "setting the parameters for treemix analysis, note that setting treemix set to false will skip this workflow"
+        )
+        name = self.u.read_options(self.param_treemix)
+        int_param_dict = {
+            "k_snps": [1, 10000],
+            "n_bootstrap": [1, 10000],
+            "n_mig": [0, 1000],
+            "n_iter": [0, 1000],
+        }
+        bool_list = ["treemix", "set_random_seed", "rand_k_snps"]
+        args_list = ["treemix_args"]
+        while name != "back":
+            if name in int_param_dict:
+                update_param = self.u.read_int_prompt(
+                    name,
+                    self.help_treemix[name],
+                    self.param_treemix[name],
+                    int_param_dict[name][0],
+                    int_param_dict[name][1],
+                )
+            if name in bool_list:
+                update_param = self.u.read_bool_confirm(name, self.help_treemix[name])
+            if name in args_list:
+                update_param = self.u.read_string_args_prompt(
+                    name,
+                    self.help_treemix[name],
+                    self.param_treemix[name],
+                    self.tool_args[name],
+                )
+            self.param_treemix[name] = update_param
+            self.u.clear_screen()
+            self.u.print_global_header()
+            self.u.print_local_header(
+                "setting the parameters for treemix analysis, note that setting treemix set to false will skip this workflow"
+            )
+            name = self.u.read_options(self.param_treemix)
+        self.u.clear_screen()
+        return self.param_treemix
 
 
 class SetGeneticStructureParam:
@@ -203,15 +293,11 @@ class SetGeneticStructureParam:
         self.param_genetic_structure = param_genetic_structure
         self.tool_args = self.d.tool_args
 
-    def print_header(self):
-        console.print(
-            f"[yellow]setting the parameters for the analyses to explore genetic structure, note that if genetic_structure is set to false, then all the below-mentioned analyses will be skipped [/yellow]"
-        )
-        console.print(f"[green]type n to skip entering any parameter[/green]")
-
     def main_function(self):
-        self.u.print_header()
-        self.print_header()
+        self.u.print_global_header()
+        self.u.print_local_header(
+            "setting the parameters for the analyses to explore genetic structure, note that if genetic_structure is set to false, then all the below-mentioned analyses will be skipped"
+        )
         name = self.u.read_options(self.param_genetic_structure)
         map_ext_dict = {
             "rem_indi_structure": ".txt",
@@ -270,8 +356,10 @@ class SetGeneticStructureParam:
                 )
             self.param_genetic_structure[name] = update_param
             self.u.clear_screen()
-            self.u.print_header()
-            self.print_header()
+            self.u.print_global_header()
+            self.u.print_local_header(
+                "setting the parameters for the analyses to explore genetic structure, note that if genetic_structure is set to false, then all the below-mentioned analyses will be skipped"
+            )
             name = self.u.read_options(self.param_genetic_structure)
         self.u.clear_screen()
         return self.param_genetic_structure
@@ -284,15 +372,11 @@ class SetSnpFilteringParam:
         self.help_snp_filtering = self.d.help_snp_filtering
         self.param_snp_filtering = param_snp_filtering
 
-    def print_header(self):
-        console.print(
-            f"[yellow]setting the parameters for filtering the SNPs, note that if apply_snp_filters is set to false, then the SNP-filtering step is skipped entirely [/yellow]"
-        )
-        console.print(f"[green]type n to skip entering any parameter[/green]")
-
     def main_function(self):
-        self.u.print_header()
-        self.print_header()
+        self.u.print_global_header()
+        self.u.print_local_header(
+            "setting the parameters for filtering the SNPs, note that if apply_snp_filters is set to false, then the SNP-filtering step is skipped entirely"
+        )
         name = self.u.read_options(self.param_snp_filtering)
         map_ext_dict = {"rem_snps": ".txt"}
         int_param_dict = {
@@ -328,8 +412,10 @@ class SetSnpFilteringParam:
                 )
             self.param_snp_filtering[name] = update_param
             self.u.clear_screen()
-            self.u.print_header()
-            self.print_header()
+            self.u.print_global_header()
+            self.u.print_local_header(
+                "setting the parameters for filtering the SNPs, note that if apply_snp_filters is set to false, then the SNP-filtering step is skipped entirely"
+            )
             name = self.u.read_options(self.param_snp_filtering)
         self.u.clear_screen()
         return self.param_snp_filtering
@@ -342,15 +428,11 @@ class SetIndiFilteringParam:
         self.help_indi_filtering = self.d.help_indi_filtering
         self.param_indi_filtering = param_indi_filtering
 
-    def print_header(self):
-        console.print(
-            f"[yellow]setting the parameters for filtering samples, note that if apply_indi_filters is set to false, then the sample-filtering step is skipped entirely [/yellow]"
-        )
-        console.print(f"[green]type n to skip entering any parameter[/green]")
-
     def main_function(self):
-        self.u.print_header()
-        self.print_header()
+        self.u.print_global_header()
+        self.u.print_local_header(
+            "setting the parameters for filtering samples, note that if apply_indi_filters is set to false, then the sample-filtering step is skipped entirely"
+        )
         name = self.u.read_options(self.param_indi_filtering)
         map_ext_dict = {"rem_indi": ".txt"}
         int_param_dict = {
@@ -383,8 +465,10 @@ class SetIndiFilteringParam:
                 )
             self.param_indi_filtering[name] = update_param
             self.u.clear_screen()
-            self.u.print_header()
-            self.print_header()
+            self.u.print_global_header()
+            self.u.print_local_header(
+                "setting the parameters for filtering samples, note that if apply_indi_filters is set to false, then the sample-filtering step is skipped entirely"
+            )
             name = self.u.read_options(self.param_indi_filtering)
         self.u.clear_screen()
         return self.param_indi_filtering
@@ -398,6 +482,8 @@ class ScalepopgenCli:
         self.param_indi_filtering = self.d.param_indi_filtering
         self.param_snp_filtering = self.d.param_snp_filtering
         self.param_genetic_structure = self.d.param_genetic_structure
+        self.param_treemix = self.d.param_treemix
+        self.param_sig_sel = self.d.selection_options
 
     def read_yaml(self):
         if confirm("[yellow]read existing yaml file of the parameters?[/yellow]"):
@@ -420,9 +506,9 @@ class ScalepopgenCli:
 
     def main_function(self):
         self.u.clear_screen()
-        self.u.print_header()
+        self.u.print_global_header()
         self.read_yaml()
-        self.u.print_header()
+        self.u.print_global_header()
         analyses = [
             "the general input, output and other global parameters",
             "the parameters to remove samples",
@@ -448,7 +534,13 @@ class ScalepopgenCli:
             if analysis == analyses[3]:
                 gs = SetGeneticStructureParam(self.param_genetic_structure)
                 self.param_genetic_structure = gs.main_function()
-            self.u.print_header()
+            if analysis == analyses[4]:
+                ta = SetTreemixParam(self.param_treemix)
+                self.param_treemix = ta.main_function()
+            if analysis == analyses[5]:
+                sa = SetSigSelParam(self.param_sig_sel)
+                sa.main_function()
+            self.u.print_global_header()
             console.print("[yellow]Set or view:[/yellow]")
             analysis = select(analyses, cursor="🢧", cursor_style="cyan")
         self.u.clear_screen()

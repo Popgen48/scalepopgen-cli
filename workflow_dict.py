@@ -113,15 +113,26 @@ class worfklow_dict:
             "ibs_plot_yml": "popgen48-scalepopgen/extra/plots/ibs_nj.yml",
         }
 
-        self.treemix_options = {
-            "treemix": "false",
+        self.help_treemix = {
+            "treemix": "whether to run the treemix workflow",
+            "k_snps": "windows of size n SNPs to be grouped together for treemix analysis",
+            "treemix_args": "Set additional parameters of treemix tools",
+            "n_bootstrap": "number of bootstrapping to run for treemix analyis (without migration edge)",
+            "set_random_seed": "whether to set the seed for random number generation",
+            "n_mig": "total number of migration edges to be added, set this to zero to skip adding migration edges",
+            "n_iter": "number of iterations to be carried out for each migration edge value",
+            "rand_k_snps": "whether or not to randomized the values of k_snps for each iteration of n_iter",
+        }
+
+        self.param_treemix = {
+            "treemix": False,
             "k_snps": 500,
             "treemix_args": "null",
             "n_bootstrap": 5,
-            "set_random_seed": "true",
+            "set_random_seed": True,
             "n_mig": 4,
             "n_iter": 3,
-            "rand_k_snps": "true",
+            "rand_k_snps": True,
         }
 
         self.selection_options = {
@@ -149,5 +160,10 @@ class worfklow_dict:
                 "-c",
                 "-B",
                 "--cv",
-            ]
+            ],
+            "treemix_args": [
+                "-noss",
+                "-cor_mig",
+                "-se",
+            ],
         }
