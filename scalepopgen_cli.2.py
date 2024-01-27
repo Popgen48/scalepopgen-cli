@@ -38,7 +38,7 @@ class util:
             gpl.append(f"[yellow]{key}[/yellow]: [green]{dict[key]}[/green]")
         gpl.append("back")
         name = select(gpl, cursor="🢧", cursor_style="cyan")
-        name = name if name == "back" else self.regex_pattern(str(name))
+        name = str(name) if name == "back" else self.regex_pattern(str(name))
         return name
 
     def is_file_exit(self, file, default_param):
@@ -203,11 +203,138 @@ class SetGeneralParameters:
 
 
 class SetSigSelParam:
-    def __init__(self, param_sig_sel):
+    def __init__(self, param_general_sig_sel, param_vcftools_sel, param_sweepfinder2):
         self.d = dictionary()
         self.u = util()
         self.tool_args = self.d.tool_args
-        self.param_sig_sel = param_sig_sel
+        self.help_general_sig_sel = self.d.help_general_sig_sel
+        self.help_vcftools_sel = self.d.help_vcftools_sel
+        self.help_sweepfinder2 = self.d.help_sweepfinder2
+        self.param_general_sig_sel = param_general_sig_sel
+        self.param_vcftools_sel = param_vcftools_sel
+        self.param_sweepfinder2 = param_sweepfinder2
+
+    def set_param_general_sig_sel(self):
+        self.u.print_global_header()
+        self.u.print_local_header(
+            "setting the general parameters to run signature of selection analyses"
+        )
+        name = self.u.read_options(self.param_general_sig_sel)
+        int_param_dict = {
+            "min_sample_size": [1, 99999999],
+            "window_size": [1, 100000000000],
+            "step_size": [1, 100000000000],
+            "perc_threshold": [0, 1],
+        }
+        bool_list = ["skip_outgroup"]
+        map_ext_dict = {
+            "skip_pop": ".txt",
+            "selection_plot_yml": ".yml",
+        }
+        while name != "back":
+            if name in int_param_dict:
+                update_param = self.u.read_int_prompt(
+                    name,
+                    self.help_general_sig_sel[name],
+                    self.param_general_sig_sel[name],
+                    int_param_dict[name][0],
+                    int_param_dict[name][1],
+                )
+            if name in map_ext_dict:
+                update_param = self.u.read_file_prompt(
+                    name,
+                    self.help_general_sig_sel[name],
+                    self.param_general_sig_sel[name],
+                    map_ext_dict[name],
+                )
+            if name in bool_list:
+                update_param = self.u.read_bool_confirm(
+                    name, self.help_general_sig_sel[name]
+                )
+            self.param_general_sig_sel[name] = update_param
+            self.u.clear_screen()
+            self.u.print_global_header()
+            self.u.print_local_header(
+                "setting the general parameters to run signature of selection analyses"
+            )
+            name = self.u.read_options(self.param_general_sig_sel)
+        self.u.clear_screen()
+
+    def set_param_vcftools_sel(self):
+        self.u.print_global_header()
+        self.u.print_local_header(
+            "setting the parameters to run signature of selection analysis using vcftools"
+        )
+        name = self.u.read_options(self.param_vcftools_sel)
+        bool_list = [
+            "skip_chromwise",
+            "pairwise_local_fst",
+            "fst_one_vs_all",
+            "tajimas_d",
+            "pi_val",
+        ]
+        while name != "back":
+            if name in bool_list:
+                update_param = self.u.read_bool_confirm(
+                    name, self.help_vcftools_sel[name]
+                )
+            self.param_vcftools_sel[name] = update_param
+            self.u.clear_screen()
+            self.u.print_global_header()
+            self.u.print_local_header(
+                "setting the parameters to run signature of selection analysis using vcftools"
+            )
+            name = self.u.read_options(self.param_vcftools_sel)
+        self.u.clear_screen()
+
+    def set_param_sweepfinder2(self):
+        self.u.print_global_header()
+        self.u.print_local_header("setting the parameters to run sweepfinder2 workflow")
+        name = self.u.read_options(self.param_sweepfinder2)
+        bool_list = [
+            "sweepfinder2",
+            "est_anc_alleles",
+        ]
+        int_param_dict = {
+            "grid_space": [1, 99999999],
+            "grid_points": [1, 99999999],
+        }
+        map_ext_dict = {
+            "recomb_map": ".map",
+        }
+        sweepfinder2_model = ["l", "lr", "s"]
+        while name != "back":
+            if name in bool_list:
+                update_param = self.u.read_bool_confirm(
+                    name, self.help_sweepfinder2[name]
+                )
+            if name in int_param_dict:
+                update_param = self.u.read_int_prompt(
+                    name,
+                    self.help_sweepfinder2[name],
+                    self.param_sweepfinder2[name],
+                    int_param_dict[name][0],
+                    int_param_dict[name][1],
+                )
+            if name in map_ext_dict:
+                update_param = self.u.read_file_prompt(
+                    name,
+                    self.help_sweepfinder2[name],
+                    self.param_sweepfinder2[name],
+                    map_ext_dict[name],
+                )
+            if name == "sweepfinder2_model":
+                update_param = select(
+                    sweepfinder2_model, cursor="🢧", cursor_style="cyan"
+                )
+            self.param_sweepfinder2[name] = update_param
+            self.u.clear_screen()
+            self.u.print_global_header()
+            self.u.print_local_header(
+                "setting the parameters to run sweepfinder2 workflow"
+            )
+            name = self.u.read_options(self.param_sweepfinder2)
+        self.u.clear_screen()
 
     def main_function(self):
         self.u.print_global_header()
@@ -216,15 +343,21 @@ class SetSigSelParam:
         )
         analyses = [
             "set the general parameters which are appplicable for all the analyses implemented in this section",
-            "set the parameters of the workflows for vcftools-based analyses (fst, Tajimas'D and pi-values)",
-            "set the parameters of the workflow of sweepfinder2",
-            "set the parameters of the workflow to phased the data",
-            "set the parameters of the workflows for selscan-based analyses (iHS, XP-EHH)",
+            "set the parameters of the workflows to run vcftools-based analyses (fst, Tajimas'D and pi-values)",
+            "set the parameters of the workflow to run sweepfinder2",
+            "set the parameters of the workflow to phase the data",
+            "set the parameters of the workflows to run selscan-based analyses (iHS, XP-EHH)",
             "back",
         ]
         analysis = select(analyses, cursor="🢧", cursor_style="cyan")
         while str(analysis) != "back":
-            print(analysis)
+            self.u.clear_screen()
+            if str(analysis) == analyses[0]:
+                self.set_param_general_sig_sel()
+            if str(analysis) == analyses[1]:
+                self.set_param_vcftools_sel()
+            if str(analysis) == analyses[2]:
+                self.set_param_sweepfinder2()
             self.u.clear_screen()
             self.u.print_global_header()
             self.u.print_local_header(
@@ -232,6 +365,11 @@ class SetSigSelParam:
             )
             analysis = select(analyses, cursor="🢧", cursor_style="cyan")
         self.u.clear_screen()
+        return (
+            self.param_general_sig_sel,
+            self.param_vcftools_sel,
+            self.param_sweepfinder2,
+        )
 
 
 class SetTreemixParam:
@@ -483,7 +621,9 @@ class ScalepopgenCli:
         self.param_snp_filtering = self.d.param_snp_filtering
         self.param_genetic_structure = self.d.param_genetic_structure
         self.param_treemix = self.d.param_treemix
-        self.param_sig_sel = self.d.selection_options
+        self.param_general_sig_sel = self.d.param_general_sig_sel
+        self.param_vcftools_sel = self.d.param_vcftools_sel
+        self.param_sweepfinder2 = self.d.param_sweepfinder2
 
     def read_yaml(self):
         if confirm("[yellow]read existing yaml file of the parameters?[/yellow]"):
@@ -538,8 +678,16 @@ class ScalepopgenCli:
                 ta = SetTreemixParam(self.param_treemix)
                 self.param_treemix = ta.main_function()
             if analysis == analyses[5]:
-                sa = SetSigSelParam(self.param_sig_sel)
-                sa.main_function()
+                sa = SetSigSelParam(
+                    self.param_general_sig_sel,
+                    self.param_vcftools_sel,
+                    self.param_sweepfinder2,
+                )
+                (
+                    self.param_general_sig_sel,
+                    self.param_vcftools_sel,
+                    self.param_sweepfinder2,
+                ) = sa.main_function()
             self.u.print_global_header()
             console.print("[yellow]Set or view:[/yellow]")
             analysis = select(analyses, cursor="🢧", cursor_style="cyan")

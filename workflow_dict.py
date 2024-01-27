@@ -135,20 +135,62 @@ class worfklow_dict:
             "rand_k_snps": True,
         }
 
-        self.selection_options = {
+        self.help_general_sig_sel = {
+            "min_sample_size": "minimum sample size per population to be required to be included in signature of selection analyses",
+            "window_size": "window size to be used for the analysis of vcftools and sweepfinder2",
+            "step_size": "step size to be used for the analysis of vcftools",
+            "skip_pop": "the path to the text file containing population IDs to be excluded from all the analyses of this section",
+            "skip_outgroup": "whether or not to include outgroup in the signature of selection analyses",
+            "selection_plot_yml": "the path to the yaml file containing the parameters to plot interactive Manhattan plot",
+            "perc_threshold": "cutoff to consider regions as candidates of selection",
+        }
+
+        self.param_general_sig_sel = {
             "min_sample_size": 8,
-            "skip_pop": "null",
-            "skip_outgroup": "false",
-            "selection_plot_yml": "popgen48-scalepopgen/extra/plots/manhattanplot.yml",
-            "pairwise_local_fst": "true",
-            "fst_one_vs_all": "true",
-            "tajimas_d": "true",
-            "pi_val": "true",
-            "skip_chromwise": "false",
             "window_size": 50000,
             "step_size": 50000,
+            "skip_pop": "null",
+            "skip_outgroup": False,
+            "selection_plot_yml": "popgen48-scalepopgen/extra/plots/manhattanplot.yml",
             "perc_threshold": 0.01,
         }
+
+        self.help_vcftools_sel = {
+            "skip_chromwise": "whether to run vcftools separately for each chromosome for each population, setting this to true will concatenate the chromosomes for each population before running the analysis",
+            "pairwise_local_fst": "whether to calculate pairwise fst in windows or for each SNPs for every possible pair of population",
+            "fst_one_vs_all": "whether to calculate pairwise fst in windows for each SNPs for pairwise comparison, where another population in pair is the the pooled samples excluding the population which it is being compared with",
+            "tajimas_d": "whether to calculate Tajima's D statistic",
+            "pi_val": "whether to calculate pi values",
+        }
+
+        self.param_vcftools_sel = {
+            "skip_chromwise": False,
+            "pairwise_local_fst": False,
+            "fst_one_vs_all": False,
+            "tajimas_d": False,
+            "pi_val": False,
+        }
+
+        self.help_sweepfinder2 = {
+            "est_anc_alleles": "whether to run the workflow to detect ancestral alleles using est-sfs",
+            "anc_alleles_map": "the map file containing information about ancestral allele at each SNP position",
+            "sweepfinder2": "whether to run sweepfinder2 workflow",
+            "sweepfinder2_model": "the type of model in sweepfinder2 to run",
+            "grid_space": "user-defined space between grid-points, option g of SweepFinder2",
+            "grid_points": "user-defined number of equally spaced points to be tested, option G of SweepFinder2",
+            "recomb_map": "the path to the file containing information about recombination map file as required by sweepfinder2, if not provided, recombination file will be created using default recombination rate value",
+        }
+
+        self.param_sweepfinder2 = {
+            "sweepfinder2": False,
+            "sweepfinder2_model": "l",
+            "est_anc_alleles": False,
+            "anc_alleles_map": "null",
+            "grid_space": 50000,
+            "grid_points": "null",
+            "recomb_map": "null",
+        }
+
         self.tool_args = {
             "admixture_args": [
                 "--seed",
