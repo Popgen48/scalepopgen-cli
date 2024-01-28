@@ -191,6 +191,54 @@ class worfklow_dict:
             "recomb_map": "null",
         }
 
+        self.help_phasing = {
+            "skip_phasing": "whether to skip the phasing step",
+            "phasing_panel": "a map file containing first column as chromosome id and second column as the path to its respective vcf reference panel",
+            "phasing_map": "a map file containing first column as chromosome id and second column as the path to its recombination map file",
+            "beagle5": "phase genotypes using beagle5",
+            "burnin": "maximum burnin iterations (in beagle5)",
+            "iteration": "phasing iterations (in beagle5)",
+            "ne": "effective population size (in beagle5)",
+            "impute": "impute ungenotyped markers",
+            "beagle5_args": "set additional parameters of beagle5 tool",
+            "shapeit5": "phase genotypes using shapeit5",
+            "shapeit5_args": "set parameters of shapeit5 tool",
+        }
+
+        self.param_phasing = {
+            "skip_phasing": False,
+            "phasing_panel": "null",
+            "phasing_map": "null",
+            "beagle5": False,
+            "burnin": 3,
+            "iteration": 12,
+            "ne": 100000,
+            "impute": False,
+            "beagle5_args": "null",
+            "shapeit5": True,
+            "shapeit5_args": "null",
+        }
+
+        self.help_selscan = {
+            "ihs": "whether to run ihs analysis as implemented in selscan",
+            "xpehh": "whether to run xpehh analysis as implemented in selscan",
+            "selscan_map": "path to a map file containing first column as chromosome id and second column as the path to its recombination map as required by selscan",
+            "ihs_args": "arguments for ihs analysis in selscan",
+            "xpehh_args": "arguments for xpehh analysis in selscan",
+            "ihs_norm_args": "additional arguments to normalize ihs score",
+            "xpehh_norm_args": "additional arguments to normalize xpehh score",
+        }
+
+        self.param_selscan = {
+            "ihs": False,
+            "xpehh": False,
+            "selscan_map": "null",
+            "ihs_args": "null",
+            "xpehh_args": "null",
+            "ihs_norm_args": "null",
+            "xpehh_norm_args": "null",
+        }
+
         self.tool_args = {
             "admixture_args": [
                 "--seed",
@@ -207,5 +255,69 @@ class worfklow_dict:
                 "-noss",
                 "-cor_mig",
                 "-se",
+            ],
+            "beagle5_args": [
+                "phase-states",
+                "imp-states",
+                "cluster",
+                "ap",
+                "gp",
+                "err",
+                "em",
+                "window",
+                "overlap",
+                "seed",
+            ],
+            "shapeit5_args": [
+                "--seed",
+                "--pedigree",
+                "--haploids",
+                "--mcmc-iterations",
+                "--mcmc-prune",
+                "--mcmc-noinit",
+                "--pbwt-modulo",
+                "--pbwt-depth",
+                "--pbwt-mac",
+                "--pbwt-mdr",
+                "--pbwt-window",
+                "--hmm-window",
+                "--hmm-ne",
+                "--filter-maf",
+            ],
+            "ihs_args": [
+                "--alt",
+                "--cutoff",
+                "--ehh-win",
+                "--gap-scale",
+                "--ihs-detail",
+                "--maf",
+                "--max-extend",
+            ],
+            "xpehh_args": [
+                "--alt",
+                "--cutoff",
+                "--ehh-win",
+                "--gap-scale",
+                "--ihs-detail",
+                "--maf",
+                "--max-extend",
+            ],
+            "ihs_norm_args": [
+                "--bins",
+                "--bp-win",
+                "--crit-percent",
+                "--crit-val",
+                "--min-snps",
+                "--qbins",
+                "--winsize",
+            ],
+            "xpehh_norm_args": [
+                "--bins",
+                "--bp-win",
+                "--crit-percent",
+                "--crit-val",
+                "--min-snps",
+                "--qbins",
+                "--winsize",
             ],
         }

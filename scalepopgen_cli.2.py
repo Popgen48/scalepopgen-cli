@@ -2,6 +2,7 @@ import os
 import os.path
 import time
 import re
+from typing import OrderedDict
 import prompt_toolkit
 from prompt_toolkit.completion import PathCompleter
 from beaupy.spinners import *
@@ -99,7 +100,10 @@ class util:
         if string_o == "n":
             return default_param
         else:
-            pattern = re.compile(r"[\-A-Za-z]+")
+            if param == "beagle5_args":
+                pattern = r"([^=\s\s+]+)\="
+            else:
+                pattern = re.compile(r"[\-A-Za-z]+")
             obs_args_list = re.findall(pattern, string_o)
             for args in obs_args_list:
                 if args not in exp_args_list:
@@ -203,16 +207,27 @@ class SetGeneralParameters:
 
 
 class SetSigSelParam:
-    def __init__(self, param_general_sig_sel, param_vcftools_sel, param_sweepfinder2):
+    def __init__(
+        self,
+        param_general_sig_sel,
+        param_vcftools_sel,
+        param_sweepfinder2,
+        param_phasing,
+        param_selscan,
+    ):
         self.d = dictionary()
         self.u = util()
         self.tool_args = self.d.tool_args
         self.help_general_sig_sel = self.d.help_general_sig_sel
         self.help_vcftools_sel = self.d.help_vcftools_sel
         self.help_sweepfinder2 = self.d.help_sweepfinder2
+        self.help_phasing = self.d.help_phasing
+        self.help_selscan = self.d.help_selscan
         self.param_general_sig_sel = param_general_sig_sel
         self.param_vcftools_sel = param_vcftools_sel
         self.param_sweepfinder2 = param_sweepfinder2
+        self.param_phasing = param_phasing
+        self.param_selscan = param_selscan
 
     def set_param_general_sig_sel(self):
         self.u.print_global_header()
@@ -336,6 +351,81 @@ class SetSigSelParam:
             name = self.u.read_options(self.param_sweepfinder2)
         self.u.clear_screen()
 
+    def set_param_phasing(self):
+        self.u.print_global_header()
+        self.u.print_local_header("setting the parameters for phasing workflow")
+        name = self.u.read_options(self.param_phasing)
+        bool_list = ["skip_phasing", "beagle5", "impute", "shapeit5"]
+        int_param_dict = {
+            "burnin": [1, 1000000],
+            "iterations": [1, 10000000],
+            "ne": [1, 1000000000],
+        }
+        map_ext_dict = {"phasing_panel": ".map", "phasing_map": ".map"}
+        args_list = ["beagle5_args", "shapeit5_args"]
+        while name != "back":
+            if name in bool_list:
+                update_param = self.u.read_bool_confirm(name, self.help_phasing[name])
+            if name in int_param_dict:
+                update_param = self.u.read_int_prompt(
+                    name,
+                    self.help_phasing[name],
+                    self.param_phasing[name],
+                    int_param_dict[name][0],
+                    int_param_dict[name][1],
+                )
+            if name in map_ext_dict:
+                update_param = self.u.read_file_prompt(
+                    name,
+                    self.help_phasing[name],
+                    self.param_phasing[name],
+                    map_ext_dict[name],
+                )
+            if name in args_list:
+                update_param = self.u.read_string_args_prompt(
+                    name,
+                    self.help_phasing[name],
+                    self.param_phasing[name],
+                    self.tool_args[name],
+                )
+            self.param_phasing[name] = update_param
+            self.u.clear_screen()
+            self.u.print_global_header()
+            self.u.print_local_header("setting the parameters for phasing workflow")
+            name = self.u.read_options(self.param_phasing)
+        self.u.clear_screen()
+
+    def set_param_selscan(self):
+        self.u.print_global_header()
+        self.u.print_local_header("setting the parameters for iHS and XP-EHH workflows")
+        name = self.u.read_options(self.param_selscan)
+        bool_list = ["ihs", "xpehh"]
+        map_ext_dict = {"selscan_map": ".map"}
+        args_list = ["ihs_args", "xpehh_args", "ihs_norm_args", "xpehh_norm_args"]
+        while name != "back":
+            if name in bool_list:
+                update_param = self.u.read_bool_confirm(name, self.help_selscan[name])
+            if name in map_ext_dict:
+                update_param = self.u.read_file_prompt(
+                    name,
+                    self.help_selscan[name],
+                    self.param_selscan[name],
+                    map_ext_dict[name],
+                )
+            if name in args_list:
+                update_param = self.u.read_string_args_prompt(
+                    name,
+                    self.help_selscan[name],
+                    self.param_selscan[name],
+                    self.tool_args[name],
+                )
+            self.param_selscan[name] = update_param
+            self.u.clear_screen()
+            self.u.print_global_header()
+            self.u.print_local_header("setting the parameters for phasing workflow")
+            name = self.u.read_options(self.param_selscan)
+        self.u.clear_screen()
+
     def main_function(self):
         self.u.print_global_header()
         self.u.print_local_header(
@@ -358,6 +448,10 @@ class SetSigSelParam:
                 self.set_param_vcftools_sel()
             if str(analysis) == analyses[2]:
                 self.set_param_sweepfinder2()
+            if str(analysis) == analyses[3]:
+                self.set_param_phasing()
+            if str(analysis) == analyses[4]:
+                self.set_param_selscan()
             self.u.clear_screen()
             self.u.print_global_header()
             self.u.print_local_header(
@@ -369,6 +463,8 @@ class SetSigSelParam:
             self.param_general_sig_sel,
             self.param_vcftools_sel,
             self.param_sweepfinder2,
+            self.param_phasing,
+            self.param_selscan,
         )
 
 
@@ -624,6 +720,8 @@ class ScalepopgenCli:
         self.param_general_sig_sel = self.d.param_general_sig_sel
         self.param_vcftools_sel = self.d.param_vcftools_sel
         self.param_sweepfinder2 = self.d.param_sweepfinder2
+        self.param_phasing = self.d.param_phasing
+        self.param_selscan = self.d.param_selscan
 
     def read_yaml(self):
         if confirm("[yellow]read existing yaml file of the parameters?[/yellow]"):
@@ -643,6 +741,51 @@ class ScalepopgenCli:
                 time.sleep(1)
                 self.param_general = self.y.param_general
         os.system("clear")
+
+    def write_yaml_prompt(self):
+        console.print("save output yaml file")
+        param_var = "output_yaml" + ":"
+        param_f = prompt_toolkit.prompt(
+            param_var,
+            completer=PathCompleter(),
+        )
+        return param_f
+
+    def write_yaml(self, param_f):
+        changed_param_dict = [
+            self.param_general,
+            self.param_indi_filtering,
+            self.param_snp_filtering,
+            self.param_genetic_structure,
+            self.param_treemix,
+            self.param_general_sig_sel,
+            self.param_vcftools_sel,
+            self.param_sweepfinder2,
+            self.param_phasing,
+            self.param_selscan,
+        ]
+        default_param_dict = [
+            self.d.param_general,
+            self.d.param_indi_filtering,
+            self.d.param_snp_filtering,
+            self.d.param_genetic_structure,
+            self.d.param_treemix,
+            self.d.param_general_sig_sel,
+            self.d.param_vcftools_sel,
+            self.d.param_sweepfinder2,
+            self.d.param_phasing,
+            self.d.param_selscan,
+        ]
+        final_dict = OrderedDict()
+        for i, v in enumerate(changed_param_dict):
+            v_default = default_param_dict[i]
+            for key in v:
+                if v[key] != v_default[key]:
+                    final_dict[key] = v[key]
+        console.print(final_dict)
+        time.sleep(10)
+        with open(param_f, "w") as dest:
+            yaml.dump(final_dict, dest)
 
     def main_function(self):
         self.u.clear_screen()
@@ -682,15 +825,21 @@ class ScalepopgenCli:
                     self.param_general_sig_sel,
                     self.param_vcftools_sel,
                     self.param_sweepfinder2,
+                    self.param_phasing,
+                    self.param_selscan,
                 )
                 (
                     self.param_general_sig_sel,
                     self.param_vcftools_sel,
                     self.param_sweepfinder2,
+                    self.param_phasing,
+                    self.param_selscan,
                 ) = sa.main_function()
             self.u.print_global_header()
             console.print("[yellow]Set or view:[/yellow]")
             analysis = select(analyses, cursor="🢧", cursor_style="cyan")
+        param_f = self.write_yaml_prompt()
+        self.write_yaml(param_f)
         self.u.clear_screen()
 
 
