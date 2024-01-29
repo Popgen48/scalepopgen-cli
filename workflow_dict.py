@@ -321,3 +321,15 @@ class worfklow_dict:
                 "--winsize",
             ],
         }
+        self.dict_list = [
+            self.param_general,
+            self.param_indi_filtering,
+            self.param_snp_filtering,
+            self.param_genetic_structure,
+            self.param_treemix,
+            self.param_general_sig_sel,
+            self.param_vcftools_sel,
+            self.param_sweepfinder2,
+            self.param_phasing,
+            self.param_selscan,
+        ]

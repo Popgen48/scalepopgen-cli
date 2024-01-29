@@ -2,7 +2,6 @@ import os
 import os.path
 import time
 import re
-from typing import OrderedDict
 import prompt_toolkit
 from prompt_toolkit.completion import PathCompleter
 from beaupy.spinners import *
@@ -119,19 +118,30 @@ class util:
                 return string_o
 
     def read_int_prompt(self, param, help_message, default_param, min_i, max_i):
+        float_list = [
+            "mind",
+            "king_cutoff",
+            "maf",
+            "hwe",
+            "max_missing",
+            "r2_threshold",
+            "perc_threshold",
+        ]
         console.print(help_message)
         param_var = param + ":"
         int_o = prompt(param_var)
         if int_o == "n":
             return default_param
-        elif float(int_o) < float(min_i) or float(int_o) > float(max_i):
-            console.print(
-                f"[red]the parameter {param_var} should be greater than or equal to {min_i} and smaller than or equal to {max_i}[/red]"
-            )
-            time.sleep(2)
-            return default_param
         else:
-            return float(int_o)
+            int_o = int(int_o) if param not in float_list else float(int_o)
+            if int_o < float(min_i) or int_o > float(max_i):
+                console.print(
+                    f"[red]the parameter {param_var} should be greater than or equal to {min_i} and smaller than or equal to {max_i}[/red]"
+                )
+                time.sleep(2)
+                return default_param
+            else:
+                return int_o
 
     def read_bool_confirm(self, param, help_message):
         console.print(help_message)
@@ -145,8 +155,16 @@ class util:
 class ReadYml:
     def __init__(self, yml):
         self.d = dictionary()
-        self.param_general = self.d.param_general
-        self.param_filtering = self.d.param_filtering
+        self.param_general = self.d.param_general.copy()
+        self.param_indi_filtering = self.d.param_indi_filtering.copy()
+        self.param_snp_filtering = self.d.param_snp_filtering.copy()
+        self.param_genetic_structure = self.d.param_genetic_structure.copy()
+        self.param_treemix = self.d.param_treemix.copy()
+        self.param_general_sig_sel = self.d.param_general_sig_sel.copy()
+        self.param_vcftools_sel = self.d.param_vcftools_sel.copy()
+        self.param_sweepfinder2 = self.d.param_sweepfinder2.copy()
+        self.param_phasing = self.d.param_phasing.copy()
+        self.param_selscan = self.d.param_selscan.copy()
         self.yml = yml
 
     def set_params(self):
@@ -672,7 +690,6 @@ class SetIndiFilteringParam:
         int_param_dict = {
             "mind": [0, 1],
             "king_cutoff": [0, 1],
-            "maf": [0, 1],
         }
         bool_list = [
             "apply_indi_filters",
@@ -712,16 +729,16 @@ class ScalepopgenCli:
     def __init__(self):
         self.d = dictionary()
         self.u = util()
-        self.param_general = self.d.param_general
-        self.param_indi_filtering = self.d.param_indi_filtering
-        self.param_snp_filtering = self.d.param_snp_filtering
-        self.param_genetic_structure = self.d.param_genetic_structure
-        self.param_treemix = self.d.param_treemix
-        self.param_general_sig_sel = self.d.param_general_sig_sel
-        self.param_vcftools_sel = self.d.param_vcftools_sel
-        self.param_sweepfinder2 = self.d.param_sweepfinder2
-        self.param_phasing = self.d.param_phasing
-        self.param_selscan = self.d.param_selscan
+        self.param_general = self.d.param_general.copy()
+        self.param_indi_filtering = self.d.param_indi_filtering.copy()
+        self.param_snp_filtering = self.d.param_snp_filtering.copy()
+        self.param_genetic_structure = self.d.param_genetic_structure.copy()
+        self.param_treemix = self.d.param_treemix.copy()
+        self.param_general_sig_sel = self.d.param_general_sig_sel.copy()
+        self.param_vcftools_sel = self.d.param_vcftools_sel.copy()
+        self.param_sweepfinder2 = self.d.param_sweepfinder2.copy()
+        self.param_phasing = self.d.param_phasing.copy()
+        self.param_selscan = self.d.param_selscan.copy()
 
     def read_yaml(self):
         if confirm("[yellow]read existing yaml file of the parameters?[/yellow]"):
@@ -776,14 +793,20 @@ class ScalepopgenCli:
             self.d.param_phasing,
             self.d.param_selscan,
         ]
-        final_dict = OrderedDict()
+        final_dict = {}
         for i, v in enumerate(changed_param_dict):
             v_default = default_param_dict[i]
             for key in v:
                 if v[key] != v_default[key]:
                     final_dict[key] = v[key]
-        console.print(final_dict)
-        time.sleep(10)
+        spinner_animation = ["▉▉", "▌▐", "  ", "▌▐", "▉▉"]
+        spinner = Spinner(
+            spinner_animation,
+            "saving yaml file of the non-default parameters ...file saved!",
+        )
+        spinner.start()
+        time.sleep(1)
+        spinner.stop()
         with open(param_f, "w") as dest:
             yaml.dump(final_dict, dest)
 
