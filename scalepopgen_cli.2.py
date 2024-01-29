@@ -153,29 +153,18 @@ class util:
 
 
 class ReadYml:
-    def __init__(self, yml):
-        self.d = dictionary()
-        self.param_general = self.d.param_general.copy()
-        self.param_indi_filtering = self.d.param_indi_filtering.copy()
-        self.param_snp_filtering = self.d.param_snp_filtering.copy()
-        self.param_genetic_structure = self.d.param_genetic_structure.copy()
-        self.param_treemix = self.d.param_treemix.copy()
-        self.param_general_sig_sel = self.d.param_general_sig_sel.copy()
-        self.param_vcftools_sel = self.d.param_vcftools_sel.copy()
-        self.param_sweepfinder2 = self.d.param_sweepfinder2.copy()
-        self.param_phasing = self.d.param_phasing.copy()
-        self.param_selscan = self.d.param_selscan.copy()
+    def __init__(self, yml, dict_list):
+        self.dict_list = dict_list
         self.yml = yml
 
     def set_params(self):
         with open(self.yml, "r") as p:
             yaml_params = yaml.load(p, Loader=SafeLoader)
-            for key in self.param_general:
-                if key in yaml_params:
-                    self.param_general[key] = yaml_params[key]
-            for key in self.param_filtering:
-                if key in yaml_params:
-                    self.param_filtering[key] = yaml_params[key]
+            for dict_i in self.dict_list:
+                for key in dict_i:
+                    if key in yaml_params:
+                        dict_i[key] = yaml_params[key]
+        return self.dict_list
 
 
 class SetGeneralParameters:
@@ -729,20 +718,13 @@ class ScalepopgenCli:
     def __init__(self):
         self.d = dictionary()
         self.u = util()
-        self.param_general = self.d.param_general.copy()
-        self.param_indi_filtering = self.d.param_indi_filtering.copy()
-        self.param_snp_filtering = self.d.param_snp_filtering.copy()
-        self.param_genetic_structure = self.d.param_genetic_structure.copy()
-        self.param_treemix = self.d.param_treemix.copy()
-        self.param_general_sig_sel = self.d.param_general_sig_sel.copy()
-        self.param_vcftools_sel = self.d.param_vcftools_sel.copy()
-        self.param_sweepfinder2 = self.d.param_sweepfinder2.copy()
-        self.param_phasing = self.d.param_phasing.copy()
-        self.param_selscan = self.d.param_selscan.copy()
+        self.dict_list = [dict_i.copy() for dict_i in self.d.dict_list]
 
     def read_yaml(self):
         if confirm("[yellow]read existing yaml file of the parameters?[/yellow]"):
-            console.print("[yellow]enter the path to the yaml file[/yellow]")
+            console.print(
+                "[yellow]enter the path to a yaml file containing parameters or type n to skip this step[/yellow]"
+            )
             yaml_file = prompt_toolkit.prompt("yaml:", completer=PathCompleter())
             if yaml_file != "n":
                 spinner_animation = ["▉▉", "▌▐", "  ", "▌▐", "▉▉"]
@@ -750,17 +732,17 @@ class ScalepopgenCli:
                 spinner.start()
                 time.sleep(2)
                 spinner.stop()
-                self.y = ReadYml(yaml_file)
-                self.y.set_params()
+                y = ReadYml(yaml_file, self.dict_list)
+                self.dict_list = y.set_params()
                 console.print(
                     f"[green]yaml file was read and the parameters have been saved[/green]"
                 )
                 time.sleep(1)
-                self.param_general = self.y.param_general
+
         os.system("clear")
 
     def write_yaml_prompt(self):
-        console.print("save output yaml file")
+        console.print("save output yaml file, type n to skip")
         param_var = "output_yaml" + ":"
         param_f = prompt_toolkit.prompt(
             param_var,
@@ -769,46 +751,23 @@ class ScalepopgenCli:
         return param_f
 
     def write_yaml(self, param_f):
-        changed_param_dict = [
-            self.param_general,
-            self.param_indi_filtering,
-            self.param_snp_filtering,
-            self.param_genetic_structure,
-            self.param_treemix,
-            self.param_general_sig_sel,
-            self.param_vcftools_sel,
-            self.param_sweepfinder2,
-            self.param_phasing,
-            self.param_selscan,
-        ]
-        default_param_dict = [
-            self.d.param_general,
-            self.d.param_indi_filtering,
-            self.d.param_snp_filtering,
-            self.d.param_genetic_structure,
-            self.d.param_treemix,
-            self.d.param_general_sig_sel,
-            self.d.param_vcftools_sel,
-            self.d.param_sweepfinder2,
-            self.d.param_phasing,
-            self.d.param_selscan,
-        ]
-        final_dict = {}
-        for i, v in enumerate(changed_param_dict):
-            v_default = default_param_dict[i]
-            for key in v:
-                if v[key] != v_default[key]:
-                    final_dict[key] = v[key]
-        spinner_animation = ["▉▉", "▌▐", "  ", "▌▐", "▉▉"]
-        spinner = Spinner(
-            spinner_animation,
-            "saving yaml file of the non-default parameters ...file saved!",
-        )
-        spinner.start()
-        time.sleep(1)
-        spinner.stop()
-        with open(param_f, "w") as dest:
-            yaml.dump(final_dict, dest)
+        if param_f != "n":
+            final_dict = {}
+            for i, v in enumerate(self.dict_list):
+                v_default = self.d.dict_list[i]
+                for key in v:
+                    if v[key] != v_default[key]:
+                        final_dict[key] = v[key]
+            spinner_animation = ["▉▉", "▌▐", "  ", "▌▐", "▉▉"]
+            spinner = Spinner(
+                spinner_animation,
+                "saving yaml file of the non-default parameters ...file saved!",
+            )
+            spinner.start()
+            time.sleep(1)
+            spinner.stop()
+            with open(param_f, "w") as dest:
+                yaml.dump(final_dict, dest)
 
     def main_function(self):
         self.u.clear_screen()
@@ -829,34 +788,34 @@ class ScalepopgenCli:
         while analysis != "save & exit":
             self.u.clear_screen()
             if analysis == analyses[0]:
-                g = SetGeneralParameters(self.param_general)
-                self.param_general = g.main_function()
+                g = SetGeneralParameters(self.dict_list[0])
+                self.dict_list[0] = g.main_function()
             if analysis == analyses[1]:
-                fi = SetIndiFilteringParam(self.param_indi_filtering)
-                self.param_indi_filtering = fi.main_function()
+                fi = SetIndiFilteringParam(self.dict_list[1])
+                self.dict_list[1] = fi.main_function()
             if analysis == analyses[2]:
-                fs = SetSnpFilteringParam(self.param_snp_filtering)
-                self.param_snp_filtering = fs.main_function()
+                fs = SetSnpFilteringParam(self.dict_list[2])
+                self.dict_list[2] = fs.main_function()
             if analysis == analyses[3]:
-                gs = SetGeneticStructureParam(self.param_genetic_structure)
-                self.param_genetic_structure = gs.main_function()
+                gs = SetGeneticStructureParam(self.dict_list[3])
+                self.dict_list[3] = gs.main_function()
             if analysis == analyses[4]:
-                ta = SetTreemixParam(self.param_treemix)
-                self.param_treemix = ta.main_function()
+                ta = SetTreemixParam(self.dict_list[4])
+                self.dict_list[4] = ta.main_function()
             if analysis == analyses[5]:
                 sa = SetSigSelParam(
-                    self.param_general_sig_sel,
-                    self.param_vcftools_sel,
-                    self.param_sweepfinder2,
-                    self.param_phasing,
-                    self.param_selscan,
+                    self.dict_list[5],
+                    self.dict_list[6],
+                    self.dict_list[7],
+                    self.dict_list[8],
+                    self.dict_list[9],
                 )
                 (
-                    self.param_general_sig_sel,
-                    self.param_vcftools_sel,
-                    self.param_sweepfinder2,
-                    self.param_phasing,
-                    self.param_selscan,
+                    self.dict_list[5],
+                    self.dict_list[6],
+                    self.dict_list[7],
+                    self.dict_list[8],
+                    self.dict_list[9],
                 ) = sa.main_function()
             self.u.print_global_header()
             console.print("[yellow]Set or view:[/yellow]")

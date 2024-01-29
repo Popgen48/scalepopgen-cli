@@ -1,1 +1,5 @@
-{}
+apply_indi_filters: true
+apply_snp_filters: true
+maf: 0.08
+max_chrom: 30
+mind: 0.08
