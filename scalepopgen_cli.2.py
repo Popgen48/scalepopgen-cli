@@ -41,20 +41,32 @@ class util:
         name = str(name) if name == "back" else self.regex_pattern(str(name))
         return name
 
-    def is_file_exit(self, file, default_param):
+    def is_file_exist(self, file, default_param):
         lc = 0
         is_vcf = False if file.endswith(".p.csv") else True
+        is_vcf_exist = True
         with open(file) as source:
             for line in source:
                 line = line.rstrip().split(",")
                 if lc == 0:
                     lc += 1
                 else:
-                    if not os.path.isfile(line[1]) or not os.path.isfile(line[2]):
-                        console.print(
-                            f"[red]vcf or index does not exits for {line}[/red]"
-                        )
-                        time.sleep(2)
+                    if is_vcf:
+                        if not os.path.isfile(line[1]) or not os.path.isfile(line[2]):
+                            console.print(
+                                f"[red]vcf or index does not exits for {line}[/red]"
+                            )
+                            time.sleep(2)
+                            is_vcf_exist = False
+                    else:
+                        if not os.path.isfile(line[1]) or not os.path.isfile(line[2]) or not os.path.isfile(line[3]):
+                            console.print(
+                                f"[red].bed, .bim or .fam does not exits for {line}[/red]"
+                            )
+                            time.sleep(2)
+                            is_vcf_exist = False
+        return file if is_vcf_exist else default_param
+
 
     def read_file_prompt(self, param, help_message, default_param, ext):
         console.print(help_message)
@@ -73,10 +85,11 @@ class util:
             return default_param
         else:
             param_f = (
-                self.is_file_exit(param_f, default_param)
+                self.is_file_exist(param_f, default_param)
                 if param == "input"
                 else param_f
             )
+            param_f=os.path.abspath(str(param_f))
             return param_f
 
     def read_string_prompt(self, param, help_message, default_param):
@@ -185,7 +198,7 @@ class SetGeneralParameters:
             "input": ".csv",
             "fasta": ".fna",
         }
-        str_list = ["outprefix", "outgroup"]
+        str_list = ["outprefix", "outgroup","outdir"]
         while name != "back":
             if name in map_ext_dict:
                 update_param = self.u.read_file_prompt(
