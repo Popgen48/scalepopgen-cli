@@ -742,12 +742,23 @@ class ScalepopgenCli:
         os.system("clear")
 
     def write_yaml_prompt(self):
-        console.print("save output yaml file, type n to skip")
+        console.print(
+            "save output yaml file; the file must end with .yml or .yaml or type n to exit without saving the parameter file"
+        )
         param_var = "output_yaml" + ":"
         param_f = prompt_toolkit.prompt(
             param_var,
             completer=PathCompleter(),
         )
+        while (
+            not param_f.endswith(".yml")
+            and not param_f.endswith(".yaml")
+            and param_f != "n"
+        ):
+            param_f = prompt_toolkit.prompt(
+                param_var,
+                completer=PathCompleter(),
+            )
         return param_f
 
     def write_yaml(self, param_f):

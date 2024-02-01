@@ -82,9 +82,9 @@ class worfklow_dict:
             "admixture_colors": "Custom colors for Admixture plot",
             "admixture_plot_pop_order": "Order of populations for Admixture plot",
             "admixture_plot_yml": "The yml file to plot interactive Admixture results",
-            "pairwise_global_fst": "Calculate pairwise Fst distances?",
+            "pairwise_global_fst": "Calculate pairwise Fst distances between each pair of populations",
             "fst_plot_yml": "The yml file to plot interactive Fst-based NJ tree",
-            "ibs_dist": "Calculate 1-ibs distances?",
+            "ibs_dist": "Calculate 1-ibs distances between each pair of samples",
             "ibs_plot_yml": "The yml file to plot interactive IBS-based NJ tree",
         }
 
@@ -333,3 +333,20 @@ class worfklow_dict:
             self.param_phasing,
             self.param_selscan,
         ]
+
+        self.citation_dict = {
+            "apply_indi_filters": [
+                "./BibTeX/Plink.bibtex",
+                "./BibTeX/VCFtools.bibtex",
+            ],
+            "apply_snp_filters": [
+                "./BibTeX/Plink.bibtex",
+                "./BibTeX/VCFtools.bibtex",
+            ],
+            "ld_filt": ["./BibTeX/Plink.bibtex"],
+            "pca": ["./BibTeX/Eigensoft.bibtex"],
+            "admixture": ["./BibTeX/Admixture.bibtex"],
+            "pairwise_global_fst": ["./BibTeX/Plink.bibtex", "./BibTeX/toytree.bibtex"],
+            "ibs_dist": ["./BibTeX/Plink.bibtex", "./BibTeX/ete3.bibtex"],
+            "treemix": ["./BibTeX/Treemix.bibtex"],
+        }
