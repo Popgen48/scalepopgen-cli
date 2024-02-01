@@ -1,4 +1,0 @@
-genetic_structure: true
-ld_step_size: 100
-ld_window_size: 100
-r2_threshold: 0.2
