@@ -37,7 +37,7 @@ class util:
         for key in dict:
             gpl.append(f"[yellow]{key}[/yellow]: [green]{dict[key]}[/green]")
         gpl.append("back")
-        name = select(gpl, cursor="🢧", cursor_style="cyan")
+        name = select(gpl)
         name = str(name) if name == "back" else self.regex_pattern(str(name))
         return name
 
@@ -360,7 +360,7 @@ class SetSigSelParam:
                 )
             if name == "sweepfinder2_model":
                 update_param = select(
-                    sweepfinder2_model, cursor="🢧", cursor_style="cyan"
+                    sweepfinder2_model
                 )
             self.param_sweepfinder2[name] = update_param
             self.u.clear_screen()
@@ -459,7 +459,7 @@ class SetSigSelParam:
             "set the parameters of the workflows to run selscan-based analyses (iHS, XP-EHH)",
             "back",
         ]
-        analysis = select(analyses, cursor="🢧", cursor_style="cyan")
+        analysis = select(analyses)
         while str(analysis) != "back":
             self.u.clear_screen()
             if str(analysis) == analyses[0]:
@@ -477,7 +477,7 @@ class SetSigSelParam:
             self.u.print_local_header(
                 "setting the parameters for running the workflows to identify the signatures of selection"
             )
-            analysis = select(analyses, cursor="🢧", cursor_style="cyan")
+            analysis = select(analyses)
         self.u.clear_screen()
         return (
             self.param_general_sig_sel,
@@ -808,7 +808,7 @@ class ScalepopgenCli:
             "save & exit",
         ]
         console.print("[yellow]Set or view:[/yellow]")
-        analysis = select(analyses, cursor="🢧", cursor_style="cyan")
+        analysis = select(analyses)
         while analysis != "save & exit":
             self.u.clear_screen()
             if analysis == analyses[0]:
@@ -843,7 +843,7 @@ class ScalepopgenCli:
                 ) = sa.main_function()
             self.u.print_global_header()
             console.print("[yellow]Set or view:[/yellow]")
-            analysis = select(analyses, cursor="🢧", cursor_style="cyan")
+            analysis = select(analyses)
         param_f = self.write_yaml_prompt()
         self.write_yaml(param_f)
         self.u.clear_screen()
