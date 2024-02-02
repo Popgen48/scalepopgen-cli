@@ -49,6 +49,16 @@ class util:
             for line in source:
                 line = line.rstrip().split(",")
                 if lc == 0:
+                    if is_vcf:
+                        exp_header = ["chrom", "vcf", "vcf_idx"]
+                    else:
+                        exp_header = ["prefix", "bed", "bim", "fam"]
+                    if exp_header != line:
+                        console.print(
+                            f'[red]the header should be:{",".join(exp_header)} but it is: {line}[/red]'
+                        )
+                        time.sleep(1)
+                        is_vcf_exist = False
                     lc += 1
                 else:
                     if is_vcf:
@@ -56,17 +66,20 @@ class util:
                             console.print(
                                 f"[red]vcf or index does not exits for {line}[/red]"
                             )
-                            time.sleep(2)
+                            time.sleep(1)
                             is_vcf_exist = False
                     else:
-                        if not os.path.isfile(line[1]) or not os.path.isfile(line[2]) or not os.path.isfile(line[3]):
+                        if (
+                            not os.path.isfile(line[1])
+                            or not os.path.isfile(line[2])
+                            or not os.path.isfile(line[3])
+                        ):
                             console.print(
                                 f"[red].bed, .bim or .fam does not exits for {line}[/red]"
                             )
-                            time.sleep(2)
+                            time.sleep(1)
                             is_vcf_exist = False
         return file if is_vcf_exist else default_param
-
 
     def read_file_prompt(self, param, help_message, default_param, ext):
         console.print(help_message)
@@ -81,7 +94,7 @@ class util:
             console.print(
                 f"[red]{param_var}{param_f} does not exist or does not end with {ext}[/red]"
             )
-            time.sleep(2)
+            time.sleep(1)
             return default_param
         else:
             param_f = (
@@ -89,7 +102,7 @@ class util:
                 if param == "input"
                 else param_f
             )
-            param_f=os.path.abspath(str(param_f))
+            param_f = os.path.abspath(str(param_f))
             return param_f
 
     def read_string_prompt(self, param, help_message, default_param):
@@ -123,7 +136,7 @@ class util:
                         f"[red]the parameter {args} is not the expected argument for {param}[/red]"
                     )
                     is_broken = True
-                    time.sleep(2)
+                    time.sleep(1)
                     break
             if is_broken:
                 return default_param
@@ -151,7 +164,7 @@ class util:
                 console.print(
                     f"[red]the parameter {param_var} should be greater than or equal to {min_i} and smaller than or equal to {max_i}[/red]"
                 )
-                time.sleep(2)
+                time.sleep(1)
                 return default_param
             else:
                 return int_o
@@ -198,7 +211,11 @@ class SetGeneralParameters:
             "input": ".csv",
             "fasta": ".fna",
         }
-        str_list = ["outprefix", "outgroup","outdir"]
+        int_param_dict = {
+            "window_size": [1, 100000000000],
+            "step_size": [1, 100000000000],
+        }
+        str_list = ["outprefix", "outgroup", "outdir"]
         while name != "back":
             if name in map_ext_dict:
                 update_param = self.u.read_file_prompt(
@@ -211,9 +228,13 @@ class SetGeneralParameters:
                 update_param = self.u.read_string_prompt(
                     name, self.help_general[name], self.param_general[name]
                 )
-            if name == "max_chrom":
+            if name in int_param_dict:
                 update_param = self.u.read_int_prompt(
-                    name, self.help_general[name], self.param_general[name], 1, 100
+                    name,
+                    self.help_general[name],
+                    self.param_general[name],
+                    int_param_dict[name][0],
+                    int_param_dict[name][1],
                 )
             if name == "allow_extra_chrom":
                 update_param = self.u.read_bool_confirm(name, self.help_general[name])
@@ -359,9 +380,7 @@ class SetSigSelParam:
                     map_ext_dict[name],
                 )
             if name == "sweepfinder2_model":
-                update_param = select(
-                    sweepfinder2_model
-                )
+                update_param = select(sweepfinder2_model)
             self.param_sweepfinder2[name] = update_param
             self.u.clear_screen()
             self.u.print_global_header()
@@ -743,7 +762,7 @@ class ScalepopgenCli:
                 spinner_animation = ["▉▉", "▌▐", "  ", "▌▐", "▉▉"]
                 spinner = Spinner(spinner_animation, "reading yaml file ...")
                 spinner.start()
-                time.sleep(2)
+                time.sleep(1)
                 spinner.stop()
                 y = ReadYml(yaml_file, self.dict_list)
                 self.dict_list = y.set_params()
@@ -756,7 +775,7 @@ class ScalepopgenCli:
 
     def write_yaml_prompt(self):
         console.print(
-            "save output yaml file; the file must end with .yml or .yaml or type n to exit without saving the parameter file"
+            "save output yaml file; the file must end with .yml or .yaml or type n to skip saving the parameter file"
         )
         param_var = "output_yaml" + ":"
         param_f = prompt_toolkit.prompt(
@@ -805,11 +824,12 @@ class ScalepopgenCli:
             "the parameters to explore genetic structure",
             "the parameters for treemix analysis",
             "the parameters to identify signatures of selection",
-            "save & exit",
+            "save",
+            "exit",
         ]
         console.print("[yellow]Set or view:[/yellow]")
         analysis = select(analyses)
-        while analysis != "save & exit":
+        while analysis != "exit":
             self.u.clear_screen()
             if analysis == analyses[0]:
                 g = SetGeneralParameters(self.dict_list[0])
@@ -841,11 +861,12 @@ class ScalepopgenCli:
                     self.dict_list[8],
                     self.dict_list[9],
                 ) = sa.main_function()
+            if analysis == analyses[6]:
+                param_f = self.write_yaml_prompt()
+                self.write_yaml(param_f)
             self.u.print_global_header()
             console.print("[yellow]Set or view:[/yellow]")
             analysis = select(analyses)
-        param_f = self.write_yaml_prompt()
-        self.write_yaml(param_f)
         self.u.clear_screen()
 
 

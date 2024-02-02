@@ -11,6 +11,8 @@ class worfklow_dict:
             "chrom_length_map": "If the inputs are plink binary files, map file is needed to set the chromosome id and its respective size in the vcf header, If not provided, the greatest coordinate for each chromosome will be considered as its total size. The file must end with .map.",
             "fasta": "If the inputs are plink binary files, fasta file is needed to set the reference allele in the converted vcf files. If not provided, the major allele will be set as the reference allele for all positions for all analyses",
             "outgroup": "The population id to be used as an outgroup in the following analyses: 1). treemix --> as a root in ML phylogenetic tree, 2). Fst- and IBS-based NJ clustering --> as a root, 3). signature of selection --> to determine the ancestral and derived alleles",
+            "window_size": "window size to be used for the various analyses --> summary statistics, tajimas's D, pi, fst, sweepfinder2",
+            "step_size": "step size to be used for the analysis of vcftools",
         }
 
         self.param_general = {
@@ -24,6 +26,8 @@ class worfklow_dict:
             "chrom_length_map": "null",
             "fasta": "null",
             "outgroup": "null",
+            "window_size": 50000,
+            "step_size": 50000,
         }
 
         self.help_indi_filtering = {
@@ -137,8 +141,6 @@ class worfklow_dict:
 
         self.help_general_sig_sel = {
             "min_sample_size": "minimum sample size per population to be required to be included in signature of selection analyses",
-            "window_size": "window size to be used for the analysis of vcftools and sweepfinder2",
-            "step_size": "step size to be used for the analysis of vcftools",
             "skip_pop": "the path to the text file containing population IDs to be excluded from all the analyses of this section",
             "skip_outgroup": "whether or not to include outgroup in the signature of selection analyses",
             "selection_plot_yml": "the path to the yaml file containing the parameters to plot interactive Manhattan plot",
@@ -147,8 +149,6 @@ class worfklow_dict:
 
         self.param_general_sig_sel = {
             "min_sample_size": 8,
-            "window_size": 50000,
-            "step_size": 50000,
             "skip_pop": "null",
             "skip_outgroup": False,
             "selection_plot_yml": "popgen48-scalepopgen/extra/plots/manhattanplot.yml",
