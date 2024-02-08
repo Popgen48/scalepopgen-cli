@@ -1,4 +1,5 @@
 import os
+import shutil
 import os.path
 import time
 import re
@@ -750,7 +751,9 @@ class ScalepopgenCli:
     def __init__(self):
         self.d = dictionary()
         self.u = util()
+        self.bool_var = []
         self.dict_list = [dict_i.copy() for dict_i in self.d.dict_list]
+        self.citation_dict = self.d.citation_dict
 
     def read_yaml(self):
         if confirm("[yellow]read existing yaml file of the parameters?[/yellow]"):
@@ -774,6 +777,8 @@ class ScalepopgenCli:
         os.system("clear")
 
     def write_yaml_prompt(self):
+        self.u.print_global_header()
+        console.print("[yellow]Set or view:[/yellow]")
         console.print(
             "save output yaml file; the file must end with .yml or .yaml or type n to skip saving the parameter file"
         )
@@ -800,6 +805,7 @@ class ScalepopgenCli:
                 v_default = self.d.dict_list[i]
                 for key in v:
                     if v[key] != v_default[key]:
+                        self.bool_var.append(key)
                         final_dict[key] = v[key]
             spinner_animation = ["▉▉", "▌▐", "  ", "▌▐", "▉▉"]
             spinner = Spinner(
@@ -811,6 +817,19 @@ class ScalepopgenCli:
             spinner.stop()
             with open(param_f, "w") as dest:
                 yaml.dump(final_dict, dest)
+            self.copy_citations(param_f)
+
+    def copy_citations(self, param_f):
+        prefix_pattern = "([^./]+)"
+        prefix = re.findall(prefix_pattern, param_f)
+        path = "./citations_" + prefix[0] + "/"
+        for key in self.citation_dict:
+            if key in self.bool_var:
+                path_t = os.path.join(path, key)
+                os.makedirs(path_t)
+                for citation in self.citation_dict[key]:
+                    path_f = os.path.join(path_t, os.path.basename(citation))
+                    shutil.copy2(citation, path_f)
 
     def main_function(self):
         self.u.clear_screen()
@@ -864,6 +883,7 @@ class ScalepopgenCli:
             if analysis == analyses[6]:
                 param_f = self.write_yaml_prompt()
                 self.write_yaml(param_f)
+                self.u.clear_screen()
             self.u.print_global_header()
             console.print("[yellow]Set or view:[/yellow]")
             analysis = select(analyses)

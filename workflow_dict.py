@@ -101,20 +101,20 @@ class worfklow_dict:
             "r2_threshold": 0.1,
             "smartpca": False,
             "smartpca_param": "null",
-            "pca_plot_yml": "popgen48-scalepopgen/extra/plots/pca.yml",
+            "pca_plot_yml": "scalepopgen/extra/plots/pca.yml",
             "marker_map": "null",
             "chrom_map": "null",
             "admixture": False,
             "start_k": 2,
             "end_k": 21,
             "admixture_args": "--cv=5",
-            "admixture_colors": "popgen48-scalepopgen/extra/hexcolorcodes.txt",
+            "admixture_colors": "scalepopgen/extra/hexcolorcodes.txt",
             "admixture_plot_pop_order": "null",
-            "admixture_plot_yml": "popgen48-scalepopgen/extra/plots/admixture.yml",
+            "admixture_plot_yml": "scalepopgen/extra/plots/admixture.yml",
             "pairwise_global_fst": False,
-            "fst_plot_yml": "popgen48-scalepopgen/extra/plots/fst_nj.yml",
+            "fst_plot_yml": "scalepopgen/extra/plots/fst_nj.yml",
             "ibs_dist": False,
-            "ibs_plot_yml": "popgen48-scalepopgen/extra/plots/ibs_nj.yml",
+            "ibs_plot_yml": "scalepopgen/extra/plots/ibs_nj.yml",
         }
 
         self.help_treemix = {
@@ -151,7 +151,7 @@ class worfklow_dict:
             "min_sample_size": 8,
             "skip_pop": "null",
             "skip_outgroup": False,
-            "selection_plot_yml": "popgen48-scalepopgen/extra/plots/manhattanplot.yml",
+            "selection_plot_yml": "scalepopgen/extra/plots/manhattanplot.yml",
             "perc_threshold": 0.01,
         }
 
@@ -349,4 +349,6 @@ class worfklow_dict:
             "pairwise_global_fst": ["./BibTeX/Plink.bibtex", "./BibTeX/toytree.bibtex"],
             "ibs_dist": ["./BibTeX/Plink.bibtex", "./BibTeX/ete3.bibtex"],
             "treemix": ["./BibTeX/Treemix.bibtex"],
+            "selscan": ["./BibTeX/Selscan.bibtex"],
+            "beagle5": ["./BibTeX/Beagle.bibtex"],
         }
