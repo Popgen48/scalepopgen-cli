@@ -215,6 +215,7 @@ class SetGeneralParameters:
         int_param_dict = {
             "window_size": [1, 100000000000],
             "step_size": [1, 100000000000],
+            "max_chrom": [1, 99],
         }
         str_list = ["outprefix", "outgroup", "outdir"]
         while name != "back":
