@@ -208,6 +208,7 @@ class SetGeneralParameters:
         map_ext_dict = {
             "sample_map": ".map",
             "chrom_length_map": ".map",
+            "chrom_id_map": ".map",
             "color_map": ".map",
             "input": ".csv",
             "fasta": ".fna",
@@ -399,12 +400,13 @@ class SetSigSelParam:
         bool_list = ["skip_phasing", "beagle5", "impute", "shapeit5"]
         int_param_dict = {
             "burnin": [1, 1000000],
-            "iterations": [1, 10000000],
+            "iteration": [1, 10000000],
             "ne": [1, 1000000000],
         }
         map_ext_dict = {"phasing_panel": ".map", "phasing_map": ".map"}
         args_list = ["beagle5_args", "shapeit5_args"]
         while name != "back":
+            print(name)
             if name in bool_list:
                 update_param = self.u.read_bool_confirm(name, self.help_phasing[name])
             if name in int_param_dict:
@@ -575,7 +577,7 @@ class SetGeneticStructureParam:
         )
         name = self.u.read_options(self.param_genetic_structure)
         map_ext_dict = {
-            "rem_indi_structure": ".txt",
+            "rem_indi_structure": ".map",
             "smartpca_param": ".txt",
             "pca_plot_yml": ".yml",
             "marker_map": ".map",

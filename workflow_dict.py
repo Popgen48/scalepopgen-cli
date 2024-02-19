@@ -9,6 +9,7 @@ class worfklow_dict:
             "max_chrom": "Maximum number of chromosomes to be considered for the analyses, note that the workflow deals only with the autosomal chromosomes.",
             "allow_extra_chrom": "set this argument to true if the chromosome id contains a string, default: false",
             "chrom_length_map": "If the inputs are plink binary files, map file is needed to set the chromosome id and its respective size in the vcf header, If not provided, the greatest coordinate for each chromosome will be considered as its total size. The file must end with .map.",
+            "chrom_id_map": "in case, chromosome id is string, provide a .map file: original chromosome id in first column and its corresponding numerical chromosome id in second column",
             "fasta": "If the inputs are plink binary files, fasta file is needed to set the reference allele in the converted vcf files. If not provided, the major allele will be set as the reference allele for all positions for all analyses",
             "outgroup": "The population id to be used as an outgroup in the following analyses: 1). treemix --> as a root in ML phylogenetic tree, 2). Fst- and IBS-based NJ clustering --> as a root, 3). signature of selection --> to determine the ancestral and derived alleles",
             "window_size": "window size to be used for the various analyses --> summary statistics, tajimas's D, pi, fst, sweepfinder2",
@@ -24,6 +25,7 @@ class worfklow_dict:
             "max_chrom": 29,
             "allow_extra_chrom": False,
             "chrom_length_map": "null",
+            "chrom_id_map": "null",
             "fasta": "null",
             "outgroup": "null",
             "window_size": 50000,
@@ -39,8 +41,8 @@ class worfklow_dict:
 
         self.param_indi_filtering = {
             "apply_indi_filters": False,
-            "king_cutoff": 0.0884,
-            "mind": 0.05,
+            "king_cutoff": "null",
+            "mind": "null",
             "rem_indi": "null",
         }
 
@@ -59,11 +61,11 @@ class worfklow_dict:
         self.param_snp_filtering = {
             "apply_snp_filters": False,
             "rem_snps": "null",
-            "maf": 0.05,
+            "maf": "null",
             "min_meanDP": "null",
             "max_meanDP": "null",
             "hwe": "null",
-            "max_missing": 0.05,
+            "max_missing": "null",
             "minQ": "null",
         }
 
@@ -74,11 +76,11 @@ class worfklow_dict:
             "ld_window_size": "Window size for LD filtering",
             "ld_step_size": "Step size for LD filtering",
             "r2_threshold": "Threshold of r2 for LD filtering",
-            "smartpca": "Perform principal component analysis?",
+            "smartpca": "Perform principal component analysis",
             "smartpca_param": "Additional parameters for PCA",
             "pca_plot_yml": "The yml file to plot interactive PCA results",
             "marker_map": "Marker shapes for PCA plot",
-            "chrom_map": "Map file to replace chromosome ids (see ./example_files/oldchrom_newchrom.map",
+            "chrom_map": "Map file to replace chromosome ids (see ./example_files/oldchrom_newchrom.map)",
             "admixture": "Perform analysis with Admixture?",
             "start_k": "Starting K-value for Admixture",
             "end_k": "Ending K-value for Admixture",
@@ -148,7 +150,7 @@ class worfklow_dict:
         }
 
         self.param_general_sig_sel = {
-            "min_sample_size": 8,
+            "min_sample_size": "null",
             "skip_pop": "null",
             "skip_outgroup": False,
             "selection_plot_yml": "scalepopgen/extra/plots/manhattanplot.yml",
@@ -350,7 +352,7 @@ class worfklow_dict:
             "ibs_dist": ["./bibtex/plink.bibtex", "./bibtex/ete3.bibtex"],
             "treemix": ["./bibtex/treemix.bibtex"],
             "selscan": ["./bibtex/selscan.bibtex"],
-            "beagle5": ["./bibTeX/beagle.bibtex"],
+            "beagle5": ["./bibteX/beagle.bibtex"],
             "shapeit5": ["./bibtex/shapeit5.bibtex"],
             "fst": ["./bibtex/vcftools.bibtex"],
             "tajimas_d": ["./bibtex/vcftools.bibtex"],
