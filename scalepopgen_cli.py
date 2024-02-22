@@ -239,7 +239,7 @@ class SetGeneralParameters:
                     int_param_dict[name][0],
                     int_param_dict[name][1],
                 )
-            if name == "allow_extra_chrom":
+            if name == "allow_extra_chrom" or name == "indiv_summary":
                 update_param = self.u.read_bool_confirm(name, self.help_general[name])
             self.param_general[name] = update_param
             self.u.clear_screen()
