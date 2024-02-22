@@ -134,10 +134,10 @@ class worfklow_dict:
             "treemix": False,
             "k_snps": 500,
             "treemix_args": "null",
-            "n_bootstrap": 5,
+            "n_bootstrap": 0,
             "set_random_seed": True,
-            "n_mig": 4,
-            "n_iter": 3,
+            "n_mig": 0,
+            "n_iter": 0,
             "rand_k_snps": True,
         }
 
