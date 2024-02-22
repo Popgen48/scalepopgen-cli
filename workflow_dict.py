@@ -14,7 +14,7 @@ class worfklow_dict:
             "outgroup": "The population id to be used as an outgroup in the following analyses: 1). treemix --> as a root in ML phylogenetic tree, 2). Fst- and IBS-based NJ clustering --> as a root, 3). signature of selection --> to determine the ancestral and derived alleles",
             "window_size": "window size to be used for the various analyses --> summary statistics, tajimas's D, pi, fst, sweepfinder2",
             "step_size": "step size to be used for the analysis of vcftools",
-            "indiv_summary": "whether to calculate individual-based and population-based sumamry statistics"
+            "indiv_summary": "whether to calculate individual-based and population-based sumamry statistics",
         }
 
         self.param_general = {
@@ -31,7 +31,7 @@ class worfklow_dict:
             "outgroup": "null",
             "window_size": 50000,
             "step_size": 50000,
-            "indiv_summary": False
+            "indiv_summary": False,
         }
 
         self.help_indi_filtering = {
